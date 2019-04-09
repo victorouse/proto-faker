@@ -13,7 +13,7 @@
     "lint": "tslint"
   },
   "bin": {
-    "build-protos": "./bin/build-protos"
+    "build-protos": "bin/build-protos"
   },
   "devDependencies": {
     "@types/faker": "^4.1.5",
