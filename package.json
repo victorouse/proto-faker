@@ -11,8 +11,9 @@
     "build": "tsc",
     "build:watch": "tsc -w",
     "lint": "tslint",
-    "prepublish": "yarn build",
-    "prepare": "yarn build"
+    "prepublish": "yarn run build",
+    "prepare": "yarn run build",
+    "postinstall": "yarn run build"
   },
   "bin": {
     "build-protos": "bin/build-protos"
