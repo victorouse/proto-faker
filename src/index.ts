@@ -109,7 +109,9 @@ const traverse = (proto: {}, mocks: {} = {}) =>
   traverseProto(proto, proto, mocks);
 
 export const mock = (protos: any) => (message: any, mocks?: any) => {
-  const { [message.name]: MockedMessage } = traverse(protos, {
+  const key = typeof message === 'string' ? message : message.name;
+
+  const { [key]: MockedMessage } = traverse(protos, {
     ...defaultMocks,
     ...primitiveMocks,
     ...mocks,
