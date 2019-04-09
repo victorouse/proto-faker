@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+
+const glob = require('glob');
+const fs = require('fs');
+const path = require('path');
+const pbjs = require('protobufjs');
+
+const parse = pathToProto => {
+  try {
+    const proto = pbjs.loadSync(pathToProto);
+    return proto.toJSON().nested;
+  } catch (error) {
+    console.error(`Cannot parse: ${pathToProto}`);
+    console.error(error);
+    process.exit(1);
+  }
+};
+
+const parseProtos = protoFiles => {
+  const protos = protoFiles.reduce((protos, protoFile) => {
+    const protoKey = protoFile
+      .split('/')
+      .pop()
+      .split('.')
+      .shift();
+
+    console.log(`# Parsing ${protoKey}.proto`);
+
+    return {
+      ...protos,
+      [protoKey]: parse(protoFile),
+    };
+  }, {});
+
+  return protos;
+};
+
+const main = () => {
+  console.log({ args: process.argv });
+  const inputPath =
+    process.argv[2] || process.env.PROTO_INPUT_PATH || '../protos';
+
+  const outputPath =
+    process.argv[3] || process.env.PROTO_OUTPUT_PATH || '../protos.json';
+
+  console.log(`# Getting proto files from: ${inputPath}`);
+
+  const protoFiles = glob.sync('*.proto', {
+    cwd: inputPath,
+    absolute: true,
+  });
+
+  const protos = parseProtos(protoFiles);
+
+  console.log(`# Writing protos to ${outputPath}`);
+
+  fs.writeFileSync(
+    path.join(__dirname, outputPath),
+    JSON.stringify(protos, null, 2),
+  );
+};
+
+main();
