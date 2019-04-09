@@ -10,7 +10,8 @@
     "clean": "rimraf dist",
     "build": "tsc",
     "build:watch": "tsc -w",
-    "lint": "tslint"
+    "lint": "tslint",
+    "prepublish": "yarn build"
   },
   "bin": {
     "build-protos": "bin/build-protos"
