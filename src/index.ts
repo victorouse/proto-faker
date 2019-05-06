@@ -3,14 +3,14 @@ import R from 'ramda';
 
 export const TIMESTAMP = 'google.protobuf.Timestamp';
 
-export const defaultMocks = {
+const defaultMocks = {
   id: () => faker.random.uuid(),
   [TIMESTAMP]: () => ({
     seconds: faker.date.recent().getTime() / 1000,
   }),
 };
 
-export const primitiveMocks = {
+const primitiveMocks = {
   string: () => faker.random.words(2),
   int32: () => faker.random.number(100),
   bool: () => faker.random.boolean(),
@@ -36,30 +36,15 @@ const mockN = (
   return mockType(k, v, mocks, protos);
 };
 
-export const getMock = (type: any, theirMocks: any) => {
-  const mocks = { ...defaultMocks, ...primitiveMocks, ...theirMocks };
-
-  if (type in mocks) {
-    return typeof mocks[type] === 'function' ? mocks[type]() : mocks[type];
-  }
-
-  if (typeof type in mocks) {
-    return typeof mocks[typeof type] === 'function'
-      ? mocks[typeof type]()
-      : mocks[typeof type];
-  }
-
-  return type;
-};
-
 const mockType = (k: any, v: any, mocks: any, protos: any) => {
-  const mockValue = [getMock(v.type, mocks)]
-    .filter(Boolean)
-    .concat(getMock(k, mocks))
-    .shift();
+  if (k in mocks) {
+    return typeof mocks[k] === 'function' ? mocks[k]() : mocks[k];
+  }
 
-  if (mockValue) {
-    return mockValue;
+  if (v.type in mocks) {
+    return typeof mocks[typeof v.type] === 'function'
+      ? mocks[v.type]()
+      : mocks[v.type];
   }
 
   if (v.type in protos) {
@@ -112,8 +97,8 @@ export const mock = (protos: any) => (message: any, mocks?: any) => {
   const key = typeof message === 'string' ? message : message.name;
 
   const { [key]: MockedMessage } = traverse(protos, {
-    ...defaultMocks,
     ...primitiveMocks,
+    ...defaultMocks,
     ...mocks,
   });
 
